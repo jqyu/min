@@ -1,16 +1,18 @@
 'use strict';
 
-const parseAST = require('./parser/');
+const G = require('graphql');
 const schema = require('./schema/');
-const processQueries = require('./query/');
 
-module.exports.handler = function (params, context) {
-  // code may be long but according to the benchmarks this takes neglible time
-  var ast = parseAST(params.request, context);
-  var store = {};
-  var r = {};
+module.exports.handler = function(params, context) {
 
-  processQueries(ast, store, r, context);
+  var query = params.request;
 
-  context.succeed({ parsed: ast });
-};
+  G.graphql(schema, query).then(result => {
+    console.log('Executed:');
+    console.log(params.request)
+    console.log('Result:');
+    console.log(result);
+    context.succeed(result);
+  });
+
+}
