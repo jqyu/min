@@ -1,0 +1,4 @@
+module.exports = {
+  host: 'localhost:4200',
+  port: 4200
+}

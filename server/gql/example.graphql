@@ -1,0 +1,30 @@
+{
+  test {
+    a
+  }
+}
+
+query {
+  test {
+    b {
+      c
+      d
+    }
+  }
+}
+
+query RootQuery(params: true) {
+  test {
+    e {
+      f(param: "value", list: ["string", true, false, null, 0.123])
+      g {
+        h
+        i
+      }
+    }
+  }
+}
+
+mutation AddThing(test: true) {
+
+}

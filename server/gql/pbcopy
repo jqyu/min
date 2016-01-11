@@ -1,0 +1,30 @@
+{
+  test {
+    a
+  }
+}
+
+query {
+  test {
+    b {
+      c
+      d
+    }
+  }
+}
+
+query RootQuery {
+  test {
+    e {
+      f
+      g {
+        h
+        i
+      }
+    }
+  }
+}
+
+mutation AddThing(test: true) {
+
+}
