@@ -13,7 +13,7 @@ query {
   }
 }
 
-query RootQuery(params: true) {
+query RootQuery {
   test {
     e {
       f(param: "value", list: ["string", true, false, null, 0.123])
@@ -25,6 +25,6 @@ query RootQuery(params: true) {
   }
 }
 
-mutation AddThing(test: true) {
+mutation {
 
 }

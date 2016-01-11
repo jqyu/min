@@ -1,0 +1,42 @@
+type Publication {
+  id: String!
+  thumbnail: String
+  description: String
+
+  channels(offset: Int, limit: Int): [Channel]
+}
+
+type Channel {
+  id: String!
+  thumbnail: String
+
+  publications: [Publication]
+  items(offset: Int, limit: Int): [Item]
+}
+
+type Item {
+  id: String!
+  thumbnail: String
+  url: String!
+  title: String
+  type: String
+
+  channels: [Channel]
+  author: User
+}
+
+enum UserRole { WRITER, EDITOR, ADMIN }
+
+type User {
+  id: String!
+  thumbnail: String
+  role: UserRole!
+
+  canEdit: [Publication]
+}
+
+type Query {
+  me: User
+  publication(id: String!): Publication
+  channel(id: String!): Channel
+}

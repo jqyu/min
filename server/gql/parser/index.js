@@ -2,6 +2,11 @@
 
 const tokenize = require('./tokenize');
 
+// TODO:
+// fragments
+// variables
+// other sundry context things
+
 module.exports = function(string, context) {
 
   const tokens = tokenize(string);
@@ -83,8 +88,8 @@ module.exports = function(string, context) {
       parseToken(true, '#RSQUARE');
       return r;
     }
-    // TODO: input objects
-    return strict && error('EXPECTED', 'literal');
+    var e = parseWord(strict);
+    return e && { e }; // enum
   }
 
   function parseParams() {
@@ -146,26 +151,28 @@ module.exports = function(string, context) {
     while (token) {
       var name = null;
       var params = null;
-      var type = 'subscriptions'; // cute hack begins
       switch (token) {
         // PARSE A QUERY
         case 'query':
           nextToken(); // chomp
           name = parseWord(false);
-          params = parseParams();
         case '#LBRACE':
-          name = name || 'RootQuery';
+          name = name || 'Query';
           parseRootNode('queries', name, params);
           break;
 
         // PARSE A MUTATION
         case 'mutation':
-          type = 'mutations'; // cute hack returns
+          nextToken(); // chomp
+          name = parseWord(false);
+          name = name || 'Mutation';
+          parseRootNode('mutations', name, params);
+          break;
         case 'subscription':
           nextToken(); // chomp
-          name = parseWord(true);
-          params = parseParams();
-          parseRootNode(type, name, params);
+          name = parseWord(false);
+          name = name || 'Subscription';
+          parseRootNode('subscriptions', name, params);
           break;
 
         default:
