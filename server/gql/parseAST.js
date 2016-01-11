@@ -14,9 +14,6 @@ module.exports = function(string, context) {
     subscriptions: []
   };
 
-  // TODO: remove this
-  r.tokenized = tokens.map((t, i) => `${i}: ${t}`);
-
   function error(type, payload) {
     var error;
     switch (type) {
