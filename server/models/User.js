@@ -15,6 +15,12 @@ const schema =
           { type: 'string'
           }
         }
+      , successors:
+        { canedit:
+          { title: 'canedit'
+          , to: 'Publication'
+          }
+        }
       };
 
 const User = Radredis(schema, transforms, redisOpts);
