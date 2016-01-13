@@ -1,47 +1,57 @@
 const G = require('graphql');
-const User = require('../../models/User');
+const _ = require('lodash');
 
-const UserType = new G.GraphQLObjectType({
-  name: 'UserType',
-  fields: {
-    name: {
-      type: G.GraphQLString,
-      resolve(p) {
-        return p.name;
+const generate = require('./generate');
+
+const models = require('../../models/');
+const User = models.User;
+const Publication = models.Publication;
+
+const PublicationType = new G.GraphQLObjectType(
+  { name: 'PublicationType'
+  , fields: () => _.assign
+      ( generate.fields(Publication.schema)
+      , { // additional fields go here
+        }
+      )
+  })
+
+const UserType = new G.GraphQLObjectType(
+  { name: 'UserType'
+  , fields: () => _.assign( generate.fields(User.schema) )
+  })
+
+const RootQueryType = new G.GraphQLObjectType(
+  { name: 'RootQueryType'
+  , fields: () => (
+    { users: generate.all(User.schema, UserType)
+    , publications: generate.all(Publication.schema, PublicationType)
+    })
+  });
+
+const RootMutationType = new G.GraphQLObjectType(
+  { name: 'RootMutationType'
+  , fields:
+    { createUser:
+      { type: UserType
+      , args:
+        { name: { type: G.GraphQLString }
+        , thumbnail: { type: G.GraphQLString }
+        }
+      , resolve: (_, args) => User.create(
+        { name: args.name || 'noname'
+        , thumbnail: args.thumbnail || '#FF0099'
+        })
       }
-    },
-    color: {
-      type: G.GraphQLString,
-      resolve(p) {
-        return p.color;
+    , createPublication:
+      { type: PublicationType
+      , args:
+        { name: { type: G.GraphQLString }
+        , thumbnail: { type: G.GraphQLString }
+        }
       }
     }
-  }
-})
-
-const RootQueryType = new G.GraphQLObjectType({
-  name: 'RootQueryType',
-  fields: {
-    hello: {
-      type: new G.GraphQLList(UserType),
-      resolve() {
-        return User.all();
-      }
-    }
-  }
-});
-
-const RootMutationType = new G.GraphQLObjectType({
-  name: 'RootMutationType',
-  fields: {
-    hello: {
-      type: UserType,
-      resolve() {
-        return User.create({ name: 'Dummy', color: 'FF0099' });
-      }
-    }
-  }
-});
+  });
 
 const schema = new G.GraphQLSchema({
   query: RootQueryType,
