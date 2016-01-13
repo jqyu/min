@@ -68,7 +68,7 @@ module.exports =
   , find: (schema, type) => (
     { type
     , args: IdentifierArgs
-    , resolve: (__, args) => models[schema.title].find(args.id)
+    , resolve: (__, args) => models[schema.title].find(args.id).get(0)
     })
 
     // TODO: support querying successors by/with weights
