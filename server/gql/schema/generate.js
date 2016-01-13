@@ -14,10 +14,20 @@ const SYSTEMSCHEMA =
   // probably as integers?
   }
 
+const propertiesToArgs = properties =>
+        _.mapValues
+          ( properties
+          , info => (
+            { type: TYPES[info.type]
+            })
+          )
+      ;
+
 const field = (name, type) => (
       { type: TYPES[type]
-      , resolve: p => p[name]
+      , resolve: p => (console.log(p[name]), p[name])
       })
+      ;
 
 module.exports =
 
@@ -25,9 +35,10 @@ module.exports =
   { field
 
   , fields: schema =>
-      _.mapValues( _.assign({}, SYSTEMSCHEMA, schema.properties)
-                 , (info, name) => field(name, info.type)
-                 )
+      _.mapValues
+        ( _.assign({}, SYSTEMSCHEMA, schema.properties)
+        , (info, name) => field(name, info.type)
+        )
 
   // utilities for generating root query
   , all: (schema, type) => (
@@ -53,8 +64,12 @@ module.exports =
     })
 
   // utilities for generating root mutation
-  , createMutation(schema, type, props) {
-    }
+  , createMutation: (schema, type, defaults, props) => (
+    { type
+    , args: propertiesToArgs(schema.properties)
+    , resolve: (__, args) =>
+        models[schema.title].create(_.assign({}, defaults, args))
+    })
   , updateMutation(schema, type, props) {
     }
   , deleteMutation(type, props) {

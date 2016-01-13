@@ -10,15 +10,16 @@ const Publication = models.Publication;
 const PublicationType = new G.GraphQLObjectType(
   { name: 'PublicationType'
   , fields: () => _.assign
-      ( generate.fields(Publication.schema)
-      , { // additional fields go here
-        }
+      ( {}
+      , generate.fields(Publication.schema)
       )
   })
 
 const UserType = new G.GraphQLObjectType(
   { name: 'UserType'
-  , fields: () => _.assign( generate.fields(User.schema) )
+  , fields: () => _.assign
+      ( generate.fields(User.schema)
+      )
   })
 
 const RootQueryType = new G.GraphQLObjectType(
@@ -33,29 +34,25 @@ const RootMutationType = new G.GraphQLObjectType(
   { name: 'RootMutationType'
   , fields:
     { createUser:
-      { type: UserType
-      , args:
-        { name: { type: G.GraphQLString }
-        , thumbnail: { type: G.GraphQLString }
-        }
-      , resolve: (_, args) => User.create(
-        { name: args.name || 'noname'
-        , thumbnail: args.thumbnail || '#FF0099'
-        })
-      }
+        generate.createMutation
+          ( User.schema
+          , UserType
+          , { name: 'no name'
+            , thumbnail: '#FF0099'
+            }
+          )
     , createPublication:
-      { type: PublicationType
-      , args:
-        { name: { type: G.GraphQLString }
-        , thumbnail: { type: G.GraphQLString }
-        }
-      }
+        generate.createMutation
+          ( Publication.schema
+          , PublicationType
+          , { name: 'no name'
+            , thumbnail: '#FF0099'
+            }
+          )
     }
   });
 
-const schema = new G.GraphQLSchema({
-  query: RootQueryType,
-  mutation: RootMutationType
-});
-
-module.exports = schema;
+module.exports =  new G.GraphQLSchema(
+  { query: RootQueryType
+  , mutation: RootMutationType
+  });

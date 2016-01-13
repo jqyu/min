@@ -7,8 +7,13 @@ const schema =
       { title: 'User'
       , type: "object"
       , properties:
-        { name: { type: 'string' }
-        , thumbnail: { type: 'string' }
+        { name:
+          { type: 'string'
+          , description: 'descriptions are a good thing to have !!'
+          }
+        , thumbnail:
+          { type: 'string'
+          }
         }
       };
 

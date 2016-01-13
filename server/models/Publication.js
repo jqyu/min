@@ -15,5 +15,4 @@ const schema =
 const Publication = Radredis(schema, transforms, redisOpts);
 
 module.exports = Publication;
-
 module.exports.schema = schema;
