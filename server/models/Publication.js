@@ -10,6 +10,12 @@ const schema =
         { name: { type: 'string' }
         , thumbnail: { type: 'string' }
         }
+      , successors:
+        { contains:
+          { title: 'contains'
+          , to: 'Channel'
+          }
+        }
       };
 
 const Publication = Radredis(schema, transforms, redisOpts);

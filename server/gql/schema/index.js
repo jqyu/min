@@ -21,10 +21,7 @@ const PublicationType = new G.GraphQLObjectType(
   , fields: () => _.assign
       ( generate.fields(Publication.schema)
       , { channels: generate.successors
-            ( Publication.schema
-            , Publication.schema.successors.contains
-            , ChannelType
-            )
+            ( Publication.schema , 'contains' , ChannelType)
         }
       )
   })
@@ -34,10 +31,7 @@ const UserType = new G.GraphQLObjectType(
   , fields: () => _.assign
       ( generate.fields(User.schema)
       , { canedit: generate.successors
-          ( User.schema
-          , User.schema.successors.canedit
-          , PublicationType
-          )
+            ( User.schema , 'canedit' , PublicationType)
         }
       )
   })
@@ -75,34 +69,22 @@ const RootMutationType = new G.GraphQLObjectType(
         )
 
     , allowEdit: generate.createEdgeMutation
-        ( User.schema
-        , User.schema.successors.canedit
-        , 'userId'
-        , 'publicationId'
-        )
+        ( User.schema , 'canedit')
 
     // PUBLICATION
     , createPublication: generate.createMutation
         ( Publication.schema
         , PublicationType
-        , { name: 'no name'
-          , thumbnail: '#FF0099'
-          }
+        , { name: 'no name' , thumbnail: '#FF0099' }
         )
     , attachChannel: generate.createEdgeMutation
-        ( Publication.schema
-        , Publication.schema.successors.contains
-        , 'publicationId'
-        , 'channelId'
-        )
+        ( Publication.schema , 'contains' )
 
     // CHANNEL
     , createChannel: generate.createMutation
         ( Channel.schema
         , ChannelType
-        , { name: 'no name'
-          , thumbnail: '#FF0099'
-          }
+        , { name: 'no name' , thumbnail: '#FF0099' }
         )
 
     }

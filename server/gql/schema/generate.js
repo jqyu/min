@@ -36,6 +36,8 @@ const field = (name, type) => (
       , resolve: p => p[name]
       })
 
+const idArg = name => (name.toLowerCase() + 'Id')
+
 module.exports =
 
   // utilities for generating types
@@ -72,14 +74,14 @@ module.exports =
     })
 
     // TODO: support querying successors by/with weights
-  , successors: (pSchema, eSchema, sType) => (
-    { type: new G.GraphQLList(sType)
+  , successors: (schema, name, type) => (
+    { type: new G.GraphQLList(type)
     , args:
         { offset: { type: G.GraphQLInt }
         , limit: { type: G.GraphQLInt }
         }
     , resolve: (obj, args) =>
-        models[pSchema.title].getSuccessors(eSchema.title, obj.id, args)
+        models[schema.title].getSuccessors(schema.successors[name].title, obj.id, args)
     })
 
   // utilities for generating root mutation
@@ -108,29 +110,41 @@ module.exports =
 
     // TODO: resolvable defaults (default lambdas)
     // don't allow extended props; better to write a custom mutation in that case
-  , createEdgeMutation: (pSchema, eSchema, pName, sName, wName) => (
+  , createEdgeMutation: (schema, name, wName) => (
     { type: G.GraphQLString
     , args: propertiesToArgs
             ( _.fromPairs(_.compact(
-              [ [ pName, { type: 'id' } ]
-              , [ sName, { type: 'id' } ]
-              , eSchema.weight && [ wName, { type: TYPES[eSchema.weight] } ]
+              [ [ idArg(schema.title), { type: 'id' } ]
+              , [ idArg(schema.successors[name].to), { type: 'id' } ]
+              , schema.successors[name].weight
+                && [ wName, { type: TYPES[schema.successors[name].weight] } ]
               ]))
             )
     , resolve: (__, args) =>
-        models[pSchema.title].addSuccessor(eSchema.title, args[pName], args[sName], args[wName])
+        models[schema.title]
+          .addSuccessor
+            ( name
+            , args[idArg(schema.title)]
+            , args[idArg(schema.successors[name].to)]
+            , args[wName]
+            )
           .then(() => "OK")
     })
-  , deleteEdgeMutation: (pSchema, eSchema, pName, sName) => (
+  , deleteEdgeMutation: (schema, name) => (
     { type: G.GraphQLString
     , args: propertiesToArgs
             ( _.fromPairs(
-              [ [ pName, { type: 'id' } ]
-              , [ sName, { type: 'id' } ]
+              [ [ idArg(schema.title), { type: 'id' } ]
+              , [ idArg(schema.successors[name].to), { type: 'id' } ]
               ])
             )
     , resolve: (__, args) =>
-        models[pSchema.title].removeSuccessor(eSchema.title, args[pName], args[sName])
+        models[schema.title]
+          .removeSuccessor
+            ( name
+            , args[idArg(schema.title)]
+            , args[idArg(schema.successors[name].to)]
+            )
           .then(() => "OK")
     })
 

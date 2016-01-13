@@ -5,9 +5,10 @@ const _ = require('lodash');
 // otherwise the object associations fuck up
 
 const Models =
-      { User: require('./User')
+      { Channel: require('./Channel')
       , Publication: require('./Publication')
-      };
+      , User: require('./User')
+      }
 
 // create successor relationships
 // note, successor schema must be of the form

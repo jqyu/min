@@ -21,9 +21,9 @@ const schema =
           , to: 'Publication'
           }
         }
-      };
+      }
 
-const User = Radredis(schema, transforms, redisOpts);
+const User = Radredis(schema, transforms, redisOpts)
 
-module.exports = User;
-module.exports.schema = schema;
+module.exports = User
+module.exports.schema = schema
