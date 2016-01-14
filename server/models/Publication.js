@@ -1,24 +1,23 @@
-const Radredis = require('radredis');
-const redisOpts = require('../../config/environment').redis;
+const Radredis = require('radredis')
+const redisOpts = require('../../config/environment').redis
 
-const transforms = {};
+const transforms = {}
 
 const schema =
       { title: 'Publication'
-      , type: "object"
+      , type: 'object'
       , properties:
         { name: { type: 'string' }
         , thumbnail: { type: 'string' }
         }
       , successors:
-        { contains:
-          { title: 'contains'
-          , to: 'Channel'
+        { has:
+          { to: 'Channel'
           }
         }
       };
 
-const Publication = Radredis(schema, transforms, redisOpts);
+const Publication = Radredis(schema, transforms, redisOpts)
 
-module.exports = Publication;
-module.exports.schema = schema;
+module.exports = Publication
+module.exports.schema = schema

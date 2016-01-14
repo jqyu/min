@@ -6,33 +6,25 @@ const _ = require('lodash');
 
 const Models =
       { Channel: require('./Channel')
+      , Item: require('./Item')
       , Publication: require('./Publication')
       , User: require('./User')
       }
 
 // create successor relationships
-// note, successor schema must be of the form
-// successor:
-// { A:
-//   { title: 'A'
-//   , ...
-//   }
-// , B:
-//   { title: 'B'
-//   , ...
-//   }
-// }
-// if titles don't match keys, schema resolution fucks up
+// NOTE: this mutates the "title" property of each edge schema
+// to aid with auto-generation of GraphQL Schema
 
 _.forEach
   ( Models
   , Model =>
       _.forEach
         ( Model.schema.successors
-        , edgeSchema =>
+        , (edgeSchema, name) =>
+            _.set(edgeSchema, 'title', name) &&
             Model.describeSuccessor(
               { type: Models[edgeSchema.to]
-              , title: edgeSchema.title
+              , title: name
               , weight: edgeSchema.weight
               })
         )

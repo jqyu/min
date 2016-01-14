@@ -1,11 +1,11 @@
-const Radredis = require('radredis');
-const redisOpts = require('../../config/environment').redis;
+const Radredis = require('radredis')
+const redisOpts = require('../../config/environment').redis
 
-const transforms = {};
+const transforms = {}
 
 const schema =
       { title: 'User'
-      , type: "object"
+      , type: 'object'
       , properties:
         { name:
           { type: 'string'
@@ -17,8 +17,10 @@ const schema =
         }
       , successors:
         { canedit:
-          { title: 'canedit'
-          , to: 'Publication'
+          { to: 'Publication'
+          }
+        , posted:
+          { to: 'Item'
           }
         }
       }
