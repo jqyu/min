@@ -61,11 +61,21 @@ const RootQueryType = new G.GraphQLObjectType(
       { type: Types.User
       , resolve: () => User.find(1).get(0)
       }
+
     , users: generate.all('User')
+    , userList: generate.findMany('User')
     , user: generate.find('User')
+
     , publications: generate.all('Publication')
+    , publicationList: generate.findMany('Publication')
     , publication: generate.find('Publication')
+
+    , channels: generate.all('Channel')
+    , channelList: generate.findMany('Channel')
     , channel: generate.find('Channel')
+
+    , items: generate.all('Item')
+    , publicationList: generate.findMany('Item')
     , item: generate.find('Item')
     })
   });
@@ -81,7 +91,6 @@ const RootMutationType = new G.GraphQLObjectType(
     , deleteUser: generate.deleteMutation('User')
     // USER EDGE MUTATIONS
     , allowEdit: generate.createEdgeMutation( 'User', 'canedit', 'Publication' )
-    , attributeUser: generate.createEdgeMutation( 'User', 'posted', 'Item' )
 
     // PUBLICATION
     , createPublication: generate.createMutation
@@ -103,6 +112,7 @@ const RootMutationType = new G.GraphQLObjectType(
         ( 'Channel' , { title: 'untitled' , thumbnail: '#FF0099' , url: 'http://bustle.com' } )
     , updateItem: generate.updateMutation('Item')
     , deleteItem: generate.deleteMutation('Item')
+    , attributeUser: generate.createEdgeMutation( 'User', 'posted', 'Item' )
 
     })
   });
