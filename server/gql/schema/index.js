@@ -49,7 +49,7 @@ Types.User = new G.GraphQLObjectType(
   , fields: () => generate.fields
       ( 'User'
       , { canedit: generate.successors ( 'User' , 'canedit' , 'Publication')
-        , items: generate.successors ( 'User' , 'posted' , 'Item' )
+        , posted: generate.successors ( 'User' , 'posted' , 'Item' )
         }
       )
   })
@@ -109,7 +109,7 @@ const RootMutationType = new G.GraphQLObjectType(
 
     // ITEM
     , createItem: generate.createMutation
-        ( 'Channel' , { title: 'untitled' , thumbnail: '#FF0099' , url: 'http://bustle.com' } )
+        ( 'Item' , { title: 'untitled' , thumbnail: '#FF0099' , url: 'http://bustle.com' } )
     , updateItem: generate.updateMutation('Item')
     , deleteItem: generate.deleteMutation('Item')
     , attributeUser: generate.createEdgeMutation( 'User', 'posted', 'Item' )
