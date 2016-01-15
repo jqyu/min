@@ -59,7 +59,7 @@ const RootQueryType = new G.GraphQLObjectType(
   , fields: () => (
     { me: // hypothetically used to resolve current session
       { type: Types.User
-      , resolve: () => User.find(1).get(0)
+      , resolve: (__, ___, root) => root.rootValue.find('User', [1]).get(0)
       }
 
     , users: generate.all('User')

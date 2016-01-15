@@ -115,7 +115,7 @@ module.exports = function(Types) {
   , find: name => (
     { type: type(name)
     , args: IdentifierArgs
-    , resolve: (__, args) => model(name).find(args.id).get(0)
+    , resolve: (__, args, req) => req.rootValue.find(name, [args.id]).get(0)
     })
 
 
