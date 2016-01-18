@@ -11,8 +11,8 @@ const TYPES =
 
 const RootSchema =
       { id: { type: 'integer' }
-      // TODO: created_at and updated_at
-      // probably as integers?
+      , created_at: { type: 'integer' }
+      , updated_at: { type: 'integer' }
       }
 
 const IdentifierArgs =
@@ -74,12 +74,11 @@ module.exports = function(Types) {
         { offset: { type: G.GraphQLInt }
         , limit: { type: G.GraphQLInt }
         }
-    , resolve: (obj, args, env) =>
-        req(env).getSuccessors(name, obj.id, args)
+    , resolve: (obj, args, env) => req(env).getSuccessors(p, name, obj.id, args)
     })
   , successor: (p, name, s) => (
     { type: type(s)
-    , resolve: obj => model(p).getSuccessors(p, name, obj.id).get(0)
+    , resolve: obj => req(env).getSuccessors(p, name, obj.id).get(0)
     })
 
   , predecessors: (p, name, s) => (
@@ -88,12 +87,11 @@ module.exports = function(Types) {
       { offset: { type: G.GraphQLInt }
       , limit: { type: G.GraphQLInt }
       }
-  , resolve: (obj, args) =>
-      model(s).getPredecessors(name, obj.id, args)
+  , resolve: (obj, args, env) => req(env).getPredecessors(s, name, obj.id, args)
   })
   , predecessor: (p, name, s) => (
   { type: type(p)
-  , resolve: (obj, __, env) => req(env).getPredecessors(p, name, obj.id).get(0)
+  , resolve: (obj, __, env) => req(env).getPredecessors(s, name, obj.id).get(0)
   })
 
   // utilities for generating root query

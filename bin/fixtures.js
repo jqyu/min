@@ -3,6 +3,9 @@ const G = require('graphql')
 const _ = require('lodash')
 const faker = require('faker')
 
+const redisOpts = require('../config/environment').redis
+const redis = require('ioredis')(redisOpts)
+
 const schema = require('../server/gql/schema/')
 const req = require('../server/models/').request()
 
@@ -109,10 +112,14 @@ function generateItems() {
 
 console.log("this takes a while, hold on...")
 console.time("took")
-Promise.resolve(require('./flushdb'))
+redis.flushdb()
   .then(generateUsers)
+  .then(console.log)
   .then(generatePublications)
+  .then(console.log)
   .then(generateChannels)
+  .then(console.log)
   .then(generateItems)
+  .then(console.log)
   .then(() => (console.log("generated fixtures", console.timeEnd("took"), process.exit())))
   .catch(e => (console.log("something fucked up", e), process.exit(1)))
