@@ -4,7 +4,7 @@ const _ = require('lodash')
 const faker = require('faker')
 
 const schema = require('../server/gql/schema/')
-const Models = require('../server/models/')
+const req = require('../server/models/').request()
 
 const NUM_USERS = 200
 const NUM_PUBLICATIONS = 3
@@ -22,7 +22,7 @@ function generateUsers() {
   }
   let queries = _.range(0, NUM_USERS).map(generateUser)
   let query = `mutation { ${_.join(queries, '')} }`;
-  return G.graphql(schema, query)
+  return G.graphql(schema, query, { req })
 
 }
 
@@ -48,7 +48,7 @@ function generatePublications() {
 
   let query = `mutation { ${_.concat(pQueries, uQueries).join('')} }`
 
-  return G.graphql(schema, query)
+  return G.graphql(schema, query, { req })
 }
 
 function generateChannels() {
@@ -74,7 +74,7 @@ function generateChannels() {
 
   let query = `mutation { ${_.concat(cQueries, pQueries).join('')} }`
 
-  return G.graphql(schema, query)
+  return G.graphql(schema, query, { req })
 }
 
 function generateItems() {
@@ -104,16 +104,15 @@ function generateItems() {
 
   let query = `mutation { ${_.concat(iQueries, cQueries).join('')} }`
 
-  return G.graphql(schema, query)
+  return G.graphql(schema, query, { req })
 }
 
 console.log("this takes a while, hold on...")
 console.time("took")
-Models.User._redis.flushdb()
+Promise.resolve(require('./flushdb'))
   .then(generateUsers)
   .then(generatePublications)
   .then(generateChannels)
   .then(generateItems)
-  .then(console.log)
   .then(() => (console.log("generated fixtures", console.timeEnd("took"), process.exit())))
   .catch(e => (console.log("something fucked up", e), process.exit(1)))

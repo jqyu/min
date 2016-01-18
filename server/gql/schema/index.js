@@ -10,13 +10,6 @@ const Types =
 
 const generate = require('./generate')(Types);
 
-const models = require('../../models/');
-
-const Channel = models.Channel;
-const Item = models.Item;
-const Publication = models.Publication;
-const User = models.User;
-
 Types.Channel = new G.GraphQLObjectType(
   { name: 'ChannelType'
   , fields: () => generate.fields
@@ -59,7 +52,7 @@ const RootQueryType = new G.GraphQLObjectType(
   , fields: () => (
     { me: // hypothetically used to resolve current session
       { type: Types.User
-      , resolve: (__, ___, root) => root.rootValue.find('User', [1]).get(0)
+      , resolve: (__, ___, env) => env.rootValue.req.get('User', 1)
       }
 
     , users: generate.all('User')

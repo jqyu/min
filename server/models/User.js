@@ -1,8 +1,3 @@
-const Radredis = require('radredis')
-const redisOpts = require('../../config/environment').redis
-
-const transforms = {}
-
 const schema =
       { title: 'User'
       , type: 'object'
@@ -25,7 +20,4 @@ const schema =
         }
       }
 
-const User = Radredis(schema, transforms, redisOpts)
-
-module.exports = User
-module.exports.schema = schema
+module.exports = schema

@@ -40,9 +40,11 @@ const field = (name, type) => (
 const model = name =>
         models[name]
 const schema = name =>
-        models[name].schema
+        models.schemas[name]
 const edge = (p, e) =>
-        models[p].schema.successors[e]
+        models.schemas[p].successors[e]
+const req = (p) =>
+        p.rootValue.req
 const idArg = name =>
         (name.toLowerCase() + '_id')
 
@@ -72,12 +74,12 @@ module.exports = function(Types) {
         { offset: { type: G.GraphQLInt }
         , limit: { type: G.GraphQLInt }
         }
-    , resolve: (obj, args) =>
-        model(p).getSuccessors(name, obj.id, args)
+    , resolve: (obj, args, env) =>
+        req(env).getSuccessors(name, obj.id, args)
     })
   , successor: (p, name, s) => (
     { type: type(s)
-    , resolve: obj => model(p).getSuccessors(name, obj.id).get(0)
+    , resolve: obj => model(p).getSuccessors(p, name, obj.id).get(0)
     })
 
   , predecessors: (p, name, s) => (
@@ -91,7 +93,7 @@ module.exports = function(Types) {
   })
   , predecessor: (p, name, s) => (
   { type: type(p)
-  , resolve: obj => model(s).getPredecessors(name, obj.id).get(0)
+  , resolve: (obj, __, env) => req(env).getPredecessors(p, name, obj.id).get(0)
   })
 
   // utilities for generating root query
@@ -101,7 +103,7 @@ module.exports = function(Types) {
         { offset: { type: G.GraphQLInt }
         , limit: { type: G.GraphQLInt }
         }
-    , resolve: (__, args) => model(name).all(args)
+    , resolve: (__, args, env) => req(env).all(name, args)
     })
 
   , findMany: name => (
@@ -109,13 +111,13 @@ module.exports = function(Types) {
     , args:
         { ids: { type: new G.GraphQLList(G.GraphQLInt) }
         }
-    , resolve: (__, args) => model(name).find(...args.ids)
+    , resolve: (__, args, env) => req(env).find(name, ...args.ids)
     })
 
   , find: name => (
     { type: type(name)
     , args: IdentifierArgs
-    , resolve: (__, args, req) => req.rootValue.find(name, [args.id]).get(0)
+    , resolve: (__, args, env) => req(env).find(name, [args.id]).get(0)
     })
 
 
@@ -125,8 +127,7 @@ module.exports = function(Types) {
   , createMutation: (name, defaults, fields) => (
     { type: type(name)
     , args: propertiesToArgs(schema(name).properties, fields)
-    , resolve: (__, args) =>
-        model(name).create(_.assign({}, defaults, args))
+    , resolve: (__, args, env) => req(env).create(name, _.assign({}, defaults, args))
     })
   , updateMutation: (name, fields) => (
     { type: type(name)
@@ -134,12 +135,12 @@ module.exports = function(Types) {
         ( IdentifierArgs
         , propertiesToArgs(schema(name).properties, fields)
         )
-    , resolve: (__, args) => model(name).update(args.id, args)
+    , resolve: (__, args, env) => req(env).update(name, args.id, args)
     })
   , deleteMutation: name => (
     { type: type(name)
     , args: IdentifierArgs
-    , resolve: (__, args) => model(name).delete(args.id)
+    , resolve: (__, args, env) => req(env).delete(name, args.id)
     })
 
   // TODO: resolvable defaults (default lambdas ??)
@@ -154,9 +155,9 @@ module.exports = function(Types) {
                 && [ wName || "weight", { type: TYPES[edge(p, name).weight] } ]
               ]))
             )
-    , resolve: (__, args) =>
-        model(p).addSuccessor
-          ( name
+    , resolve: (__, args, env) =>
+        req(env).addSuccessor
+          ( p, name
           , args[ pName || idArg(p) ]
           , args[ sName || idArg(s) ]
           , args[ wName || "weight" ]
@@ -171,9 +172,9 @@ module.exports = function(Types) {
               , [ sName || idArg(s), { type: 'id' } ]
               ])
             )
-    , resolve: (__, args) =>
-        model(p).removeSuccessor
-          ( name
+    , resolve: (__, args, env) =>
+        req(env).removeSuccessor
+          ( p, name
           , args[ pName || idArg(p) ]
           , args[ sName || idArg(s) ]
           )

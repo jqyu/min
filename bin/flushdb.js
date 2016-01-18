@@ -1,5 +1,7 @@
 // flush database
-const model = require('../server/models/User')
+const redisOpts = require('../config/environment.js').redis
 
-model._redis.flushdb()
-  .then(() => (console.log('database flushed'), process.exit()))
+const redis = require('ioredis')(redisOpts)
+
+module.exports = redis.flushdb()
+  .then(() => (console.log('database flushed')))
